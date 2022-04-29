@@ -50,6 +50,7 @@ class SelectTreeForm extends Field
         if( ! $this->url ){
             Handler::error('Error', 'select-tree: You need $form->select_tree(column,label)->ajax()');
         }
-        return parent::render()->with(compact('vars'));
+        $this->addVariables(compact('vars'));
+        return parent::render();
     }
 }

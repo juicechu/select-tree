@@ -4,13 +4,13 @@
     }
 </style>
 <div class="form-inline" id="{{$vars['id']}}"></div>
-<input type="hidden" name="{{$name}}" id="{{$name}}" value="">
+<input type="hidden" name="{{$name}}" value="{{ request($name, is_null($value) ? '' : $value) }}">
 <script>
     (function(){
-        var addSelect = function(parent_id){
+        var addSelect = function(parent_id, callback, defaultValue = 0){
             $.get("{{$vars['url']}}", {q: parent_id}, function(data){
                 if(data.hasOwnProperty('children') && data.children.length){
-                    var select = $("<select></select>");
+                    var select = $('<select class="select-layer-{{$vars['id']}}"></select>');
                     select.addClass('form-control');
                     select.append('<option selected value="0">please select..</option>');
 
@@ -18,11 +18,24 @@
                         select.append(`<option value="${v.id}">${v.title}</option>`);
                     });
                     $("#{{$vars['id']}}").append(select);
+                    if (callback) {
+                        callback(data, select);
+                    }
                     select.change(function(){
                         var that = $(this);
                         that.nextAll().remove();
-                        $("#{{$name}}").val(that.val());
-                        if( that.val() ){
+                        var val = '';
+                        $('.select-layer-{{$vars['id']}}').each(function(){
+                            sv = parseInt($(this).val())
+                            if (sv > 0) {
+                                if (val != '') {
+                                    val += ','
+                                }
+                                val += $(this).val();
+                            }
+                        })
+                        $('input[name="{{$name}}"]').val(val);
+                        if(parseInt(that.val())){
                             addSelect(that.val());
                         }
                     });
@@ -43,7 +56,7 @@
                     select.change(function(){
                         var that = $(this);
                         that.nextAll().remove();
-                        $("#{{$name}}").val(that.val());
+                        $('input[name="{{$name}}"]').val(that.val());
                         if( that.val() ){
                             addSelect(that.val());
                         }
@@ -54,18 +67,32 @@
                 }
             });
         };
+        /**
         var query_s = function() {
             var r = window.location.search.substr(1).match(/(^|&){{$name}}=([^&]*)(&|$)/i);
             return r == null || r[2] == null || r[2] == "" || r[2] == "undefined" || r[2] == "0" ? "" : r[2];
         }
+        **/
         if ("{{$vars['url']}}") {
-            var v = query_s()
-            $("#{{$name}}").val(v);
-            if(v){
-                initSelect(v);
-            }else{
-                addSelect({{$vars['top_id']}});
+            //var v = query_s()
+            var v = $('input[name="{{$name}}"]').val();
+            var ids = v.split(',').filter(Number);
+            //initSelect(v);
+            var idIndex = 0;
+            var initCallback = function(data, selector) {
+                if(data.hasOwnProperty('children') && data.children.length){
+                    if (ids[idIndex]) {
+                        $.each(data.children, function(i,v){
+                            if (v.id == ids[idIndex]) {
+                                addSelect(v.id, initCallback);
+                                selector.val(ids[idIndex]).change()
+                            }
+                        })
+                        idIndex++;
+                    }
+                }
             }
+            addSelect({{$vars['top_id']}}, initCallback);
         } else {
             $("#{{$vars['id']}}").append('select-tree: You need $filter->select_tree(column,label)->ajax()');
         }

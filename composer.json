@@ -1,9 +1,9 @@
 {
-    "name": "wgqi1126/select-tree",
+    "name": "juicechu/select-tree",
     "description": "laravel-admin select-tree",
     "type": "library",
     "keywords": ["laravel-admin", "select-tree"],
-    "homepage": "https://github.com/zhpefe/select-tree",
+    "homepage": "https://github.com/juicechu/select-tree",
     "license": "MIT",
     "authors": [
         {
@@ -11,6 +11,7 @@
             "email": "zhpefe789@gmail.com"
         }
     ],
+    "version": "1.0.0",
     "require": {
         "php": ">=7.0.0",
         "encore/laravel-admin": "~1.6"

@@ -13,7 +13,7 @@ class SelectTreeFilter extends AbstractFilter
     {
         $this->column = $column;
         $this->label = $label;
-        $this->id = 'select-tree-' . uniqid();
+        $this->uniqid = 'select-tree-' . uniqid();
         $this->setPresenter(new FilterPresenter());
     }
 
@@ -32,7 +32,7 @@ class SelectTreeFilter extends AbstractFilter
     public function render()
     {
         $vars = [
-            'id' => $this->id,
+            'id' => $this->uniqid,
             'top_id' => $this->top_id,
             'url' => $this->url,
         ];
